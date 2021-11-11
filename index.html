@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi PEM</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div id="login_div" class="main-div">
+        <h3><center>Taxi PEM</center></h3>
+        <center><img src="logo.png" width="170px"></center>
+        <br></br>
+    
+        <center><input type="email" placeholder="Correo..." id="email_field" style="width: 300px;"/></center>
+        <center><input type="password" placeholder="Contraseña..." id="password_field" style="width: 300px;"/></center>
+    
+        <center><button onclick="login()" style="width: 250px;">Iniciar Sesión</button></center>
+      </div>
+    
+      <div id="user_div" class="loggedin-div">
+        <h3>Bienvenido</h3>
+
+        <p id="user_para">Bienvenido</p>
+        <input type="button" value = "Registrar Administrador" id="btnregisteradmin" style="width: 250px; position: relative; left: 80%; background-color: #3266a8; color: aliceblue;bottom: 10px;" onclick="showform()">
+
+            <div id="registerform" style="display: none;position: relative;bottom: 10px;">
+                <form id="form">
+                    <input type="text" id="name" placeholder="Nombre Completo...">
+                    <input type="email" id="email" placeholder="Email...">
+                    <input type="text" id="password" placeholder="Contraseña...">
+                </form>
+                <input type="button"  type="submit" id="btnregister" value="Registrar" onclick="UserRegister()">
+                <input type="button" id="btncancel" value="Cancelar" onclick="cancelregister()">
+
+                
+            </div>
+
+        <div class="container">
+            <div class="input-group mb-3 mt-3">
+                <input type="text" id="searchBar" class="form-control" placeholder="Buscar conductor" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <select class="custom-select" id="typeSelected">
+                        <option selected value="1">Nombres</option>
+                        <option value="2">DNI</option>
+                      </select>
+                  <button class="btn btn-outline-primary ml-1" id="btnSearch" type="button">Buscar</button>
+                </div>
+              </div>
+            <table class="table table-light">
+                <thead>
+                    <th>#</th>
+                    <th>Nombres</th>
+                    <th>DNI</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                </thead>
+                <tbody id="tbody1">
+                </tbody>
+            </table>
+        </div>
+    
+        <button onclick="logout()" style="width: 300px;">Cerrar Sesión</button>
+        
+      </div>
+
+    
+    <!-- Button trigger modal 
+//<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+    Launch demo modal
+  </button>-->
+  
+  <!-- Modal -->
+  <!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Detalle de Conductor</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <label class="labs">Nombre :</label>
+          <strong><div id="nameModal"></div><br></strong>
+          <label class="labs">Foto de perfil</label>
+          <center><img id="imgprofile" width="200px" height="200px"></center><br>
+          <label class="labs">DNI : </label>
+          <input type="text" id="dniModal" style="font-weight: bold;"><br><br>
+          <label class="labs">Foto de DNI</label>
+          <center><img id="imgdni" width="220px" height="190px"></center><br>
+          <label class="labs">Teléfono : </label>
+          <input type="text" id="phoneModal"><br>
+          <label class="labs">Estado : </label>
+          <strong><div id="statusModal"></div></strong>
+
+        </div>
+        <div class="modal-footer">
+          <button id="updateDataButton" type="button" class="btn btn-success" onclick="updateDataDriver()">Activar Cuenta</button>
+          <button type="button" class="btn btn-danger" onclick="DeleteData()">Eliminar Cuenta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!--Firebase Libraries-->
+<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-database.js"></script> 
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<script id="MainScript">
+
+    //--------------------------------CONFIG------------------------------------//
+  
+var firebaseConfig = {
+  apiKey: "AIzaSyCDusB1f8vp7Pjz83R5CPK1t-mbDp0ZaDU",
+  authDomain: "uberclone-d9830.firebaseapp.com",
+  databaseURL: "https://uberclone-d9830-default-rtdb.firebaseio.com",
+  projectId: "uberclone-d9830",
+  storageBucket: "uberclone-d9830.appspot.com",
+  messagingSenderId: "459634198386",
+  appId: "1:459634198386:web:29a27c5b2a87f8d0353feb",
+  measurementId: "G-EEDHT7EFLT"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+var item;
+var positionItem;
+  //--------------------------------GET DATA------------------------------------//
+
+  function SelectAllData(){
+    document.getElementById('tbody1').innerHTML ="";
+    item = 0;
+    positionItem = [];
+      firebase.database().ref('Users/Drivers').once('value',
+      function(dataDriver){
+          dataDriver.forEach(
+              function(current){
+                  var name = current.val().name;
+                  var dni = current.val().dni;
+                  var phone = current.val().phone;
+                  var profile = current.val().profileCompleted;
+                  var image = current.val().image;
+                  var imageDNI = current.val().imageDNI;
+                  if(profile == 1){
+
+                    profile = "Activo";
+                  }
+                  else{
+                    profile = "Inactivo";
+                  }
+                  var id = current.val().id;
+                  AddItemsToTable(name,dni,phone,profile,id,image,imageDNI);
+              }
+          );
+      })
+  }
+  window.onload = SelectAllData;
+
+   //--------------------------------FILLING TABLE------------------------------------//
+
+
+   function AddItemsToTable(name,dni,phone,profile,id,image,imageDNI){
+       var tbody = document.getElementById('tbody1');
+       var trow = document.createElement('tr');
+       var td1 = document.createElement('td');
+       var td2 = document.createElement('td');
+       var td3 = document.createElement('td');
+       var td4 = document.createElement('td');
+       var td5 = document.createElement('td');
+
+       positionItem.push([name,dni,phone,profile,id,image,imageDNI]);
+       
+       td1.innerHTML = ++item;
+       td2.innerHTML = name;
+       td3.innerHTML = dni;
+       td4.innerHTML = phone;
+       td5.innerHTML = profile;
+
+       td2.classList += "nameField";
+       td3.classList += "dniField";
+
+       if(profile == "Activo"){
+        td5.innerHTML = profile.fontcolor("#249555").bold()
+       }
+       else{
+        td5.innerHTML = profile.fontcolor("#E21818").bold()
+       }
+
+       trow.appendChild(td1);
+       trow.appendChild(td2);
+       trow.appendChild(td3);
+       trow.appendChild(td4);
+       trow.appendChild(td5);
+
+       var controlDiv = document.createElement("div");
+       controlDiv.innerHTML = '<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter" onClick = "FillBoxItem('+item+')">Editar cuenta</button>'
+       trow.appendChild(controlDiv);
+       tbody.appendChild(trow);
+   }
+
+
+   var modName = document.getElementById('nameModal');
+   var modDni = document.getElementById('dniModal');
+   var modPhone = document.getElementById('phoneModal');
+   var modStatus = document.getElementById('statusModal');
+
+   var btnModalUpdate = document.getElementById('updateDataButton');
+
+   var idDriver
+   var phone
+
+   function FillBoxItem(index){
+
+    if(index==null){
+        modName.value = "";
+        modDni.value = "";
+        modPhone.value = "";
+        modStatus.value = "";
+    }
+    else{
+        --index;
+        document.getElementById('nameModal').innerHTML= ''+positionItem[index][0];
+        modName.value = positionItem[index][0];
+        modDni.value = positionItem[index][1];
+        modPhone.value = positionItem[index][2];
+        phone = positionItem[index][2];
+        document.getElementById('statusModal').innerHTML= ''+positionItem[index][3];
+        modDni.disabled = true;
+        modName.disabled = true;
+        modPhone.disabled = true;
+        idDriver = positionItem[index][4];
+        var urlImage = positionItem[index][5];
+        var urlDni = positionItem[index][6];
+        document.getElementById('imgprofile').src = urlImage;
+        document.getElementById('imgdni').src = urlDni;
+
+        if(positionItem[index][3] == "Activo"){
+            document.getElementById('statusModal').innerHTML = ''+positionItem[index][3].fontcolor("#249555").bold()
+            btnModalUpdate.style.display = 'none';
+        }
+        else {
+            document.getElementById('statusModal').innerHTML = ''+positionItem[index][3].fontcolor("#E21818").bold()
+            btnModalUpdate.style.display = 'inline-block';
+        }
+        
+    }
+  }
+
+  
+
+  function updateDataDriver(){
+      firebase.database().ref("Users/Drivers/"+idDriver).update({
+          profileCompleted : 1
+      },(error) =>{
+          if(error){
+              alert('No se pudo actualizar los datos');
+          }else{
+            sendSms();
+            alert('Actualizado!');
+            SelectAllData();
+            $("#exampleModalCenter").modal('hide');
+          }
+      })
+  }
+
+  function DeleteData(){
+    firebase.database().ref("Users/Drivers/"+idDriver).delete();
+    SelectAllData();
+    $("#exampleModalCenter").modal('hide');
+}
+
+function sendSms(){
+
+var strPhone = ""+phone+"";
+
+const data = JSON.stringify({
+"messages": [
+  {
+    "source": "mashape",
+    "from": "Test",
+    "body": "Su cuenta de TAXI PEM fue activada!",
+    "to":    strPhone,
+    "schedule": "1452244637",
+    "custom_string": "prueba"
+  }
+]
+});
+
+const xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+if (this.readyState === this.DONE) {
+  console.log(this.responseText);
+}
+});
+
+xhr.open("POST", "https://clicksend.p.rapidapi.com/sms/send");
+xhr.setRequestHeader("content-type", "application/json");
+xhr.setRequestHeader("authorization", "Basic Y29udGFjdG9AY29uZXhmaW4ub3JnOkZpbmFuemFzaW50ZWxpZ2VudGVzMTArKg==");
+xhr.setRequestHeader("x-rapidapi-host", "clicksend.p.rapidapi.com");
+xhr.setRequestHeader("x-rapidapi-key", "a79f8e5c23mshc421c059f1161bfp1c0b26jsn40bee7f91d53");
+
+xhr.send(data);
+
+}
+
+
+</script>
+<script src="functions.js"></script>
+
+
+</body>
+</html>
